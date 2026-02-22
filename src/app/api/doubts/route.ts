@@ -7,6 +7,8 @@ import { logActivity } from "@/lib/activity";
 import { sendDoubtResponseEmail } from "@/lib/email-templates";
 import { rateLimit } from "@/lib/rate-limit";
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -19,10 +21,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Too many requests. Please wait a moment." }, { status: 429 });
     }
 
-    const { question, imageUrl, inputMode } = await req.json();
-    if (!question?.trim()) {
+    const { question, imageUrl, imageBase64, inputMode } = await req.json();
+    if (!question?.trim() && !imageBase64) {
       return NextResponse.json(
-        { error: "Question is required" },
+        { error: "Question or image is required" },
         { status: 400 }
       );
     }
@@ -32,14 +34,19 @@ export async function POST(req: NextRequest) {
     const doubt = await prisma.doubt.create({
       data: {
         studentId: session.user.id,
-        question,
+        question: question || "Image-based question",
         imageUrl: imageUrl || null,
-        inputMode: inputMode || "text",
+        inputMode: imageBase64 ? "image" : (inputMode || "text"),
         status: "pending",
       },
     });
 
-    const aiResult = await generateDoubtResponse(question, session.user.id, doubt.id);
+    const aiResult = await generateDoubtResponse(
+      question || "",
+      session.user.id,
+      doubt.id,
+      imageBase64 || undefined
+    );
 
     const updatedDoubt = await prisma.doubt.update({
       where: { id: doubt.id },

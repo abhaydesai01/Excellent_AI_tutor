@@ -18,9 +18,9 @@ doubtRoutes.post("/", async (req: AuthRequest, res: Response) => {
       return res.status(429).json({ error: "Too many requests. Please wait a moment." });
     }
 
-    const { question, imageUrl, inputMode } = req.body;
-    if (!question?.trim()) {
-      return res.status(400).json({ error: "Question is required" });
+    const { question, imageUrl, imageBase64, inputMode } = req.body;
+    if (!question?.trim() && !imageBase64) {
+      return res.status(400).json({ error: "Question or image is required" });
     }
 
     const startTime = Date.now();
@@ -28,14 +28,19 @@ doubtRoutes.post("/", async (req: AuthRequest, res: Response) => {
     const doubt = await prisma.doubt.create({
       data: {
         studentId: user.id,
-        question,
+        question: question || "Image-based question",
         imageUrl: imageUrl || null,
-        inputMode: inputMode || "text",
+        inputMode: imageBase64 ? "image" : (inputMode || "text"),
         status: "pending",
       },
     });
 
-    const aiResult = await generateDoubtResponse(question, user.id, doubt.id);
+    const aiResult = await generateDoubtResponse(
+      question || "",
+      user.id,
+      doubt.id,
+      imageBase64 || undefined
+    );
 
     const updatedDoubt = await prisma.doubt.update({
       where: { id: doubt.id },

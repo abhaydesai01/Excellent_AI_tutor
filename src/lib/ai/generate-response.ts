@@ -45,13 +45,24 @@ export interface GenerateResult {
   tokenUsage?: TokenUsage;
 }
 
-async function callOpenAI(model: string, question: string, maxTokens: number): Promise<ModelResponse> {
+async function callOpenAI(model: string, question: string, maxTokens: number, imageBase64?: string): Promise<ModelResponse> {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+  const userContent: any[] = [{ type: "text", text: question }];
+  if (imageBase64) {
+    userContent.push({
+      type: "image_url",
+      image_url: { url: imageBase64.startsWith("data:") ? imageBase64 : `data:image/jpeg;base64,${imageBase64}` },
+    });
+  }
+
+  const useModel = imageBase64 ? "gpt-4o" : model;
+
   const completion = await openai.chat.completions.create({
-    model,
+    model: useModel,
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: question },
+      { role: "user", content: userContent },
     ],
     max_tokens: maxTokens,
     temperature: 0.3,
@@ -84,7 +95,10 @@ async function callAnthropic(model: string, question: string, maxTokens: number)
   };
 }
 
-async function callModel(config: ModelConfig, question: string): Promise<ModelResponse> {
+async function callModel(config: ModelConfig, question: string, imageBase64?: string): Promise<ModelResponse> {
+  if (imageBase64) {
+    return callOpenAI(config.model, question, config.maxTokens, imageBase64);
+  }
   if (config.provider === "openai") {
     return callOpenAI(config.model, question, config.maxTokens);
   } else {
@@ -95,24 +109,30 @@ async function callModel(config: ModelConfig, question: string): Promise<ModelRe
 export async function generateDoubtResponse(
   question: string,
   userId?: string,
-  doubtId?: string
+  doubtId?: string,
+  imageBase64?: string
 ): Promise<GenerateResult> {
-  const complexity = classifyComplexity(question);
-  const topicClassification = classifyTopic(question);
+  const questionForClassification = question || "Image-based question";
+  const complexity = classifyComplexity(questionForClassification);
+  const topicClassification = classifyTopic(questionForClassification);
   const modelConfig = selectModel(complexity.level);
+
+  const prompt = imageBase64
+    ? `${question || "Please analyze this image."}\n\nThe student has uploaded an image. Please carefully examine the image, identify any questions, problems, diagrams, or content shown, and provide a detailed step-by-step solution or explanation.`
+    : question;
 
   let modelResponse: ModelResponse;
   let finalModel = modelConfig;
   const startTime = Date.now();
 
   try {
-    modelResponse = await callModel(modelConfig, question);
+    modelResponse = await callModel(modelConfig, prompt, imageBase64);
   } catch (error) {
     const fallback = getFallbackModel(complexity.level);
     if (fallback) {
       finalModel = fallback;
       try {
-        modelResponse = await callModel(fallback, question);
+        modelResponse = await callModel(fallback, prompt, imageBase64);
       } catch {
         return {
           response: generateFallbackResponse(question, topicClassification),
