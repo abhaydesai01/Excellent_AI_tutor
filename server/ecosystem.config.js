@@ -2,9 +2,9 @@ module.exports = {
   apps: [
     {
       name: "excellent-api",
-      script: "npx",
-      args: "tsx server/index.ts",
-      cwd: "/var/www/excellent-ai-tutor",
+      script: "npm",
+      args: "start",
+      cwd: "/var/www/excellent-ai-tutor/Excellent_AI_tutor",
       instances: 1,
       autorestart: true,
       watch: false,
