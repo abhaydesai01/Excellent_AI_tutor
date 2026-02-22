@@ -39,13 +39,26 @@ authRoutes.post("/send-otp", async (req: Request, res: Response) => {
       return res.status(429).json({ error: `Please wait ${waitSec}s before requesting another OTP` });
     }
 
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.error("SMTP_USER or SMTP_PASS not set");
+      return res.status(500).json({ error: "Email service is not configured. Contact support." });
+    }
+
     const otp = await createOtp(email, type);
     await sendOtpEmail(email, otp.code);
 
     return res.json({ message: "OTP sent successfully", expiresAt: otp.expiresAt });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Send OTP error:", error);
-    return res.status(500).json({ error: "Failed to send OTP" });
+
+    if (error?.code === "EAUTH" || error?.responseCode === 535) {
+      return res.status(500).json({ error: "Email service authentication failed. Contact support." });
+    }
+    if (error?.code === "ESOCKET" || error?.code === "ECONNREFUSED") {
+      return res.status(500).json({ error: "Cannot connect to email service. Please try again later." });
+    }
+
+    return res.status(500).json({ error: "Failed to send OTP. Please try again." });
   }
 });
 

@@ -43,12 +43,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.error("SMTP_USER or SMTP_PASS not set");
+      return NextResponse.json({ error: "Email service is not configured. Contact support." }, { status: 500 });
+    }
+
     const otp = await createOtp(email, type);
     await sendOtpEmail(email, otp.code);
 
     return NextResponse.json({ message: "OTP sent successfully", expiresAt: otp.expiresAt });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Send OTP error:", error);
-    return NextResponse.json({ error: "Failed to send OTP. Check email configuration." }, { status: 500 });
+
+    if (error?.code === "EAUTH" || error?.responseCode === 535) {
+      return NextResponse.json({ error: "Email service authentication failed. Contact support." }, { status: 500 });
+    }
+    if (error?.code === "ESOCKET" || error?.code === "ECONNREFUSED") {
+      return NextResponse.json({ error: "Cannot connect to email service. Please try again later." }, { status: 500 });
+    }
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      return NextResponse.json({ error: "Email service is not configured. Contact support." }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      { error: "Failed to send OTP. Please try again or contact support." },
+      { status: 500 }
+    );
   }
 }
