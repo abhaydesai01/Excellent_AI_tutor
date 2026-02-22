@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Send, Loader2, ImagePlus, Sparkles, BookOpen, Brain, Zap, X, Image as ImageIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import DoubtCard from "@/components/DoubtCard";
+import MarkdownMath from "@/components/MarkdownMath";
 
 const MAX_IMAGE_SIZE = 4 * 1024 * 1024; // 4MB
 
@@ -247,21 +248,9 @@ export default function StudentDashboard() {
               )}
             </div>
 
-            <div className="markdown-content prose prose-sm max-w-none">
-              {result.aiResponse?.split("\n").map((line: string, i: number) => {
-                if (line.startsWith("## ")) {
-                  return <h2 key={i}>{line.replace("## ", "")}</h2>;
-                }
-                if (line.startsWith("- ")) {
-                  return <li key={i}>{line.replace("- ", "")}</li>;
-                }
-                if (line.startsWith("**") && line.endsWith("**")) {
-                  return <p key={i}><strong>{line.replace(/\*\*/g, "")}</strong></p>;
-                }
-                if (line.trim() === "") return <br key={i} />;
-                return <p key={i}>{line}</p>;
-              })}
-            </div>
+            {result.aiResponse && (
+              <MarkdownMath content={result.aiResponse} />
+            )}
           </div>
         </div>
       )}

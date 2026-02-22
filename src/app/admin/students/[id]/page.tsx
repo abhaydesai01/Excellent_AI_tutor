@@ -9,6 +9,7 @@ import {
   AlertTriangle, Shield, Clock, Zap, CheckCircle, XCircle, Mic,
   MessageSquare, Download, ChevronDown, ChevronUp,
 } from "lucide-react";
+import MarkdownMath from "@/components/MarkdownMath";
 
 export default function StudentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -381,7 +382,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                                 <span className="text-xs font-semibold text-purple-700">AI Tutor</span>
                                 {d.modelUsed && <span className="text-[10px] text-muted">{d.modelUsed}</span>}
                               </div>
-                              <div className="text-sm prose prose-sm max-w-none whitespace-pre-wrap">{d.aiResponse}</div>
+                              <MarkdownMath content={d.aiResponse} className="text-sm" />
                             </div>
                           </div>
                         )}
@@ -545,7 +546,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                                     <span className="text-xs font-semibold text-purple-700">AI Tutor</span>
                                     {entry.modelUsed && <span className="text-[10px] text-muted">{entry.modelUsed}</span>}
                                   </div>
-                                  <div className="text-sm prose prose-sm max-w-none whitespace-pre-wrap">{entry.aiResponse}</div>
+                                  <MarkdownMath content={entry.aiResponse} className="text-sm" />
                                 </div>
                               </div>
                             )}

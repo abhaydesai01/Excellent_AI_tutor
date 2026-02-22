@@ -21,6 +21,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import MarkdownMath from "@/components/MarkdownMath";
 
 type VoiceOption = "alloy" | "echo" | "fable" | "nova" | "onyx" | "shimmer";
 
@@ -452,28 +453,9 @@ export default function VoiceTutorPage() {
                     </div>
                   )}
 
-                  <div
-                    className={`text-sm leading-relaxed ${
-                      entry.type === "user" ? "" : "markdown-content"
-                    }`}
-                  >
+                  <div className="text-sm leading-relaxed">
                     {entry.type === "ai"
-                      ? entry.text.split("\n").map((line, i) => {
-                          if (line.startsWith("## "))
-                            return (
-                              <h2 key={i} className="text-base font-bold mt-3 mb-1 text-foreground">
-                                {line.replace("## ", "")}
-                              </h2>
-                            );
-                          if (line.startsWith("- "))
-                            return (
-                              <li key={i} className="ml-4 text-sm">
-                                {line.replace("- ", "")}
-                              </li>
-                            );
-                          if (line.trim() === "") return <br key={i} />;
-                          return <p key={i}>{line}</p>;
-                        })
+                      ? <MarkdownMath content={entry.text} className="text-sm" />
                       : entry.text}
                   </div>
 

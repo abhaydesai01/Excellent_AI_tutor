@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, BookOpen, Brain, Zap, Clock, Send, Loader2, Sparkles, CheckCircle, AlertCircle, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
+import MarkdownMath from "@/components/MarkdownMath";
 
 export default function DoubtDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -137,14 +138,7 @@ export default function DoubtDetail({ params }: { params: Promise<{ id: string }
               <span className="font-semibold text-sm">AI Response</span>
             </div>
 
-            <div className="markdown-content">
-              {doubt.aiResponse.split("\n").map((line: string, i: number) => {
-                if (line.startsWith("## ")) return <h2 key={i}>{line.replace("## ", "")}</h2>;
-                if (line.startsWith("- ")) return <li key={i}>{line.replace("- ", "")}</li>;
-                if (line.trim() === "") return <br key={i} />;
-                return <p key={i}>{line}</p>;
-              })}
-            </div>
+            <MarkdownMath content={doubt.aiResponse} />
           </div>
         )}
       </div>
@@ -158,14 +152,7 @@ export default function DoubtDetail({ params }: { params: Promise<{ id: string }
           {doubt.followUps.map((fu: any) => (
             <div key={fu.id} className="bg-white rounded-xl border border-border p-5">
               <p className="font-medium text-sm mb-3 text-primary">Q: {fu.question}</p>
-              <div className="markdown-content text-sm">
-                {fu.answer?.split("\n").map((line: string, i: number) => {
-                  if (line.startsWith("## ")) return <h2 key={i}>{line.replace("## ", "")}</h2>;
-                  if (line.startsWith("- ")) return <li key={i}>{line.replace("- ", "")}</li>;
-                  if (line.trim() === "") return <br key={i} />;
-                  return <p key={i}>{line}</p>;
-                })}
-              </div>
+              {fu.answer && <MarkdownMath content={fu.answer} className="text-sm" />}
             </div>
           ))}
         </div>
