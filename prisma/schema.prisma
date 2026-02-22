@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String   @unique
+  passwordHash  String
+  role          String   @default("student")
+  batch         String?
+  avatar        String?
+  emailVerified Boolean  @default(false)
+  lastLoginAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  doubts        Doubt[]
+  sessions      Session[]
+  voiceSessions VoiceSession[]
+  activityLogs  ActivityLog[]
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Doubt {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  studentId       String   @db.ObjectId
+  question        String
+  imageUrl        String?
+  aiResponse      String?
+  subject         String?
+  topic           String?
+  subTopic        String?
+  difficultyScore Float?
+  confidenceScore Float?
+  complexityLevel String?
+  modelUsed       String?
+  inputMode       String   @default("text")
+  status          String   @default("pending")
+  rating          String?
+  responseTimeMs  Int?
+  followUpCount   Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  student         User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  followUps       FollowUp[]
+
+  @@index([studentId])
+  @@index([subject])
+  @@index([createdAt])
+  @@index([inputMode])
+}
+
+model FollowUp {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  doubtId   String   @db.ObjectId
+  question  String
+  answer    String?
+  createdAt DateTime @default(now())
+
+  doubt     Doubt    @relation(fields: [doubtId], references: [id], onDelete: Cascade)
+}
+
+model Alert {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  type        String
+  title       String
+  message     String
+  studentId   String?
+  subject     String?
+  severity    String   @default("medium")
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model Otp {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  code      String
+  type      String   @default("registration")
+  verified  Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email, code])
+  @@index([expiresAt])
+}
+
+model VoiceSession {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  transcription   String
+  aiResponse      String?
+  doubtId         String?  @db.ObjectId
+  durationMs      Int?
+  ttsGenerated    Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model AiUsageLog {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String?  @db.ObjectId
+  doubtId         String?  @db.ObjectId
+  service         String   // chat, whisper-stt, tts, followup
+  model           String   // gpt-4o-mini, gpt-4.1, claude-opus-4-6, whisper-1, tts-1
+  provider        String   // openai, anthropic
+  inputTokens     Int      @default(0)
+  outputTokens    Int      @default(0)
+  totalTokens     Int      @default(0)
+  costUsd         Float    @default(0)
+  durationMs      Int?
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([service])
+  @@index([model])
+  @@index([createdAt])
+}
+
+model ActivityLog {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  action      String
+  details     String?
+  metadata    String?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
