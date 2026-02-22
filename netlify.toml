@@ -5,52 +5,35 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# Proxy all API requests to EC2 backend
-# Replace YOUR_EC2_DOMAIN with your actual EC2 domain/IP
+# Only proxy non-auth API routes to EC2
+# Auth routes (/api/auth/*) stay on Netlify as serverless functions
+
 [[redirects]]
-  from = "/api/auth/callback/*"
-  to = "http://3.108.61.212/api/auth/callback/:splat"
+  from = "/api/doubts/*"
+  to = "http://3.108.61.212/api/doubts/:splat"
   status = 200
   force = true
 
 [[redirects]]
-  from = "/api/auth/session"
-  to = "http://3.108.61.212/api/auth/session"
+  from = "/api/doubts"
+  to = "http://3.108.61.212/api/doubts"
   status = 200
   force = true
 
 [[redirects]]
-  from = "/api/auth/csrf"
-  to = "http://3.108.61.212/api/auth/csrf"
+  from = "/api/voice/*"
+  to = "http://3.108.61.212/api/voice/:splat"
   status = 200
   force = true
 
 [[redirects]]
-  from = "/api/auth/providers"
-  to = "http://3.108.61.212/api/auth/providers"
+  from = "/api/student/*"
+  to = "http://3.108.61.212/api/student/:splat"
   status = 200
   force = true
 
 [[redirects]]
-  from = "/api/auth/signin"
-  to = "http://3.108.61.212/api/auth/signin"
+  from = "/api/admin/*"
+  to = "http://3.108.61.212/api/admin/:splat"
   status = 200
   force = true
-
-[[redirects]]
-  from = "/api/auth/signout"
-  to = "http://3.108.61.212/api/auth/signout"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/*"
-  to = "http://3.108.61.212/api/:splat"
-  status = 200
-  force = true
-
-# SPA fallback
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
