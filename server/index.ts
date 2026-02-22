@@ -11,7 +11,7 @@ import { authRoutes } from "./routes/auth-routes";
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-const ALLOWED_ORIGINS = (process.env.CORS_ORIGINS || "http://localhost:3000").split(",");
+const ALLOWED_ORIGINS = (process.env.CORS_ORIGINS || "https://steady-klepon-3bde70.netlify.app").split(",");
 
 app.use(cors({
   origin: ALLOWED_ORIGINS,

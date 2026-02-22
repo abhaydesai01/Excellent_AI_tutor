@@ -74,7 +74,7 @@ export async function sendDoubtResponseEmail(params: {
       </div>
 
       <div style="margin-top: 24px; text-align: center;">
-        <a href="${process.env.NEXTAUTH_URL || "http://localhost:3000"}/student/doubt/${doubtId}" style="display: inline-block; background: linear-gradient(135deg, #8b1a2b, #b42d42); color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 600;">View Full Response &amp; Ask Follow-up</a>
+        <a href="${process.env.NEXTAUTH_URL || "https://steady-klepon-3bde70.netlify.app"}/student/doubt/${doubtId}" style="display: inline-block; background: linear-gradient(135deg, #8b1a2b, #b42d42); color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 600;">View Full Response &amp; Ask Follow-up</a>
       </div>
 
       <p style="color: #999; margin: 20px 0 0; font-size: 12px; text-align: center;">Need more help? Ask a follow-up question on the platform.</p>
@@ -134,7 +134,7 @@ export async function sendWeeklySummaryEmail(params: {
       </div>
 
       <div style="text-align: center; margin-top: 24px;">
-        <a href="${process.env.NEXTAUTH_URL || "http://localhost:3000"}/student/dashboard" style="display: inline-block; background: linear-gradient(135deg, #8b1a2b, #b42d42); color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 600;">View Full Report</a>
+        <a href="${process.env.NEXTAUTH_URL || "https://steady-klepon-3bde70.netlify.app"}/student/dashboard" style="display: inline-block; background: linear-gradient(135deg, #8b1a2b, #b42d42); color: white; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 600;">View Full Report</a>
       </div>
     </div>
   `);

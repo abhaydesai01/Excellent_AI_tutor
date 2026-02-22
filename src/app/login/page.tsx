@@ -132,13 +132,6 @@ export default function LoginPage() {
             </Link>
           </p>
 
-          <div className="mt-8 p-4 bg-primary/5 rounded-xl border border-primary/10">
-            <p className="text-xs font-medium text-primary mb-2">Demo Credentials:</p>
-            <div className="space-y-1 text-xs text-muted">
-              <p><span className="font-medium">Admin:</span> admin@aitutor.com / password123</p>
-              <p><span className="font-medium">Student:</span> aarav@student.com / password123</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
