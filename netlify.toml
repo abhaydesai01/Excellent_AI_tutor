@@ -5,35 +5,9 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# Only proxy non-auth API routes to EC2
-# Auth routes (/api/auth/*) stay on Netlify as serverless functions
-
+# Proxy ALL API routes to EC2 backend (full Next.js app running there)
 [[redirects]]
-  from = "/api/doubts/*"
-  to = "http://3.108.61.212/api/doubts/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/doubts"
-  to = "http://3.108.61.212/api/doubts"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/voice/*"
-  to = "http://3.108.61.212/api/voice/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/student/*"
-  to = "http://3.108.61.212/api/student/:splat"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/api/admin/*"
-  to = "http://3.108.61.212/api/admin/:splat"
+  from = "/api/*"
+  to = "http://3.108.61.212/api/:splat"
   status = 200
   force = true
